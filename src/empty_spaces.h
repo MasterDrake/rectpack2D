@@ -1,8 +1,10 @@
 #pragma once
 #include "insert_and_split.h"
 
-namespace rectpack2D {
-	enum class flipping_option {
+namespace rectpack2D
+{
+	enum class flipping_option
+	{
 		DISABLED,
 		ENABLED
 	};
