@@ -17,7 +17,7 @@
 	
 </div>
 
-A header-only 2D rectangle packing library written in modern C++.  
+A header-only 2D rectangle packing library written in modern C++ using EASTL.  
 This is a refactored and **highly optimized** version of the [original library](https://github.com/TeamHypersomnia/rectpack2D/tree/legacy).
 
 It was originally developed for the needs of [Hypersomnia](https://github.com/TeamHypersomnia/Hypersomnia), a free and open-source multiplayer shooter.
