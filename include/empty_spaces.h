@@ -12,7 +12,8 @@ namespace rectpack2D
 	class default_empty_spaces;
 
 	template <bool allow_flip, class empty_spaces_provider = default_empty_spaces>
-	class empty_spaces {
+	class empty_spaces
+	{
 		rect_wh current_aabb;
 		empty_spaces_provider spaces;
 
@@ -27,7 +28,7 @@ namespace rectpack2D
 		}
 
 	public:
-		using output_rect_type = std::conditional_t<allow_flip, rect_xywhf, rect_xywh>;
+		using output_rect_type = eastl::conditional_t<allow_flip, rect_xywhf, rect_xywh>;
 
 		flipping_option flipping_mode = flipping_option::ENABLED;
 
@@ -43,7 +44,7 @@ namespace rectpack2D
 		}
 
 		template <class F>
-		std::optional<output_rect_type> insert(const rect_wh image_rectangle, F report_candidate_empty_space) {
+		eastl::optional<output_rect_type> insert(const rect_wh image_rectangle, F report_candidate_empty_space) {
 			for (int i = static_cast<int>(spaces.get_count()) - 1; i >= 0; --i) {
 				const auto candidate_space = spaces.get(i);
 
@@ -52,12 +53,12 @@ namespace rectpack2D
 				auto accept_result = [this, i, image_rectangle, candidate_space](
 					const created_splits& splits,
 					const bool flipping_necessary
-				) -> std::optional<output_rect_type> {
+				) -> eastl::optional<output_rect_type> {
 					spaces.remove(i);
 
 					for (int s = 0; s < splits.count; ++s) {
 						if (!spaces.add(splits.spaces[s])) {
-							return std::nullopt;
+							return eastl::nullopt;
 						}
 					}
 
@@ -133,7 +134,7 @@ namespace rectpack2D
 				}
 			}
 
-			return std::nullopt;
+			return eastl::nullopt;
 		}
 
 		decltype(auto) insert(const rect_wh& image_rectangle) {

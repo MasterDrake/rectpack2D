@@ -1,9 +1,9 @@
 #pragma once
-#include <optional>
-#include <vector>
-#include <array>
-#include <variant>
-#include <algorithm>
+#include <EASTL/optional.h>
+#include <EASTL/vector.h>
+#include <EASTL/array.h>
+#include <EASTL/variant.h>
+#include <EASTL/sort.h>
 
 #include "insert_and_split.h"
 #include "empty_spaces.h"
@@ -11,12 +11,14 @@
 
 #include "best_bin_finder.h"
 
-namespace rectpack2D {
+namespace rectpack2D
+{
 	template <class empty_spaces_type>
 	using output_rect_t = typename empty_spaces_type::output_rect_type;
 
 	template <class F, class G>
-	struct finder_input {
+	struct finder_input
+	{
 		const int max_bin_side;
 		const int discard_step;
 		F handle_successful_insertion;
@@ -35,8 +37,8 @@ namespace rectpack2D {
 		return finder_input<F, G> { 
 			max_bin_side, 
 			discard_step, 
-			std::forward<F>(handle_successful_insertion),
-			std::forward<G>(handle_unsuccessful_insertion),
+			eastl::forward<F>(handle_successful_insertion),
+			eastl::forward<G>(handle_unsuccessful_insertion),
 			flipping_mode
 		};
 	};
@@ -48,10 +50,10 @@ namespace rectpack2D {
 
 	template <class empty_spaces_type, class F, class G>
 	rect_wh find_best_packing_dont_sort(
-		std::vector<output_rect_t<empty_spaces_type>>& subjects,
+		eastl::vector<output_rect_t<empty_spaces_type>>& subjects,
 		const finder_input<F, G>& input
 	) {
-		using order_type = std::remove_reference_t<decltype(subjects)>;
+		using order_type = eastl::remove_reference_t<decltype(subjects)>;
 
 		return find_best_packing_impl<empty_spaces_type, order_type>(
 			[&subjects](auto callback) { callback(subjects); },
@@ -70,17 +72,17 @@ namespace rectpack2D {
 
 	template <class empty_spaces_type, class F, class G, class Comparator, class... Comparators>
 	rect_wh find_best_packing(
-		std::vector<output_rect_t<empty_spaces_type>>& subjects,
+		eastl::vector<output_rect_t<empty_spaces_type>>& subjects,
 		const finder_input<F, G>& input,
 
 		Comparator comparator,
 		Comparators... comparators
 	) {
 		using rect_type = output_rect_t<empty_spaces_type>;
-		using order_type = std::vector<rect_type*>;
+		using order_type = eastl::vector<rect_type*>;
 
 		constexpr auto count_orders = 1 + sizeof...(Comparators);
-		thread_local std::array<order_type, count_orders> orders;
+		thread_local eastl::array<order_type, count_orders> orders;
 
 		{
 			/* order[0] will always exist since this overload requires at least one comparator */
@@ -89,7 +91,7 @@ namespace rectpack2D {
 
 			for (auto& s : subjects) {
 				if (s.area() > 0) {
-					initial_pointers.emplace_back(std::addressof(s));
+					initial_pointers.emplace_back(eastl::addressof(s));
 				}
 			}
 
@@ -102,8 +104,9 @@ namespace rectpack2D {
 
 		auto& orders_ref = orders;
 
-		auto make_order = [&f, &orders_ref](auto& predicate) {
-			std::sort(orders_ref[f].begin(), orders_ref[f].end(), predicate);
+		auto make_order = [&f, &orders_ref](auto& predicate)
+		{
+			eastl::sort(orders_ref[f].begin(), orders_ref[f].end(), predicate);
 			++f;
 		};
 
@@ -123,7 +126,7 @@ namespace rectpack2D {
 
 	template <class empty_spaces_type, class F, class G>
 	rect_wh find_best_packing(
-		std::vector<output_rect_t<empty_spaces_type>>& subjects,
+		eastl::vector<output_rect_t<empty_spaces_type>>& subjects,
 		const finder_input<F, G>& input
 	) {
 		using rect_type = output_rect_t<empty_spaces_type>;
@@ -139,7 +142,7 @@ namespace rectpack2D {
 				return a->perimeter() > b->perimeter();
 			},
 			[](const rect_type* const a, const rect_type* const b) {
-				return std::max(a->w, a->h) > std::max(b->w, b->h);
+				return eastl::max(a->w, a->h) > eastl::max(b->w, b->h);
 			},
 			[](const rect_type* const a, const rect_type* const b) {
 				return a->w > b->w;

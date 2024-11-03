@@ -1,32 +1,39 @@
 #pragma once
-#include <array>
+#include <EASTL/array.h>
 #include "rect_structs.h"
 
-namespace rectpack2D {
-	struct created_splits {
+namespace rectpack2D
+{
+	struct created_splits
+	{
 		int count = 0;
-		std::array<space_rect, 2> spaces;
+		eastl::array<space_rect, 2> spaces;
 
-		static auto failed() {
+		static auto failed()
+		{
 			created_splits result;
 			result.count = -1;
 			return result;
 		}
 
-		static auto none() {
+		static auto none()
+		{
 			return created_splits();
 		}
 
 		template <class... Args>
-		created_splits(Args&&... args) : spaces({ std::forward<Args>(args)... }) {
+		created_splits(Args&&... args) : spaces({ eastl::forward<Args>(args)... })
+		{
 			count = sizeof...(Args);
 		}
 
-		bool better_than(const created_splits& b) const {
+		bool better_than(const created_splits& b) const
+		{
 			return count < b.count;
 		}
 
-		explicit operator bool() const {
+		explicit operator bool() const
+		{
 			return count != -1;
 		}
 	};

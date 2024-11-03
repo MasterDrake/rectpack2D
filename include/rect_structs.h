@@ -1,10 +1,12 @@
 #pragma once
-#include <utility>
+#include <EASTL/utility.h>
 
-namespace rectpack2D {
+namespace rectpack2D
+{
 	using total_area_type = int;
 
-	struct rect_wh {
+	struct rect_wh
+	{
 		rect_wh() : w(0), h(0) {}
 		rect_wh(const int w, const int h) : w(w), h(h) {}
 
@@ -12,7 +14,7 @@ namespace rectpack2D {
 		int h;
 
 		auto& flip() {
-			std::swap(w, h);
+			eastl::swap(w, h);
 			return *this;
 		}
 
@@ -29,12 +31,13 @@ namespace rectpack2D {
 
 		template <class R>
 		void expand_with(const R& r) {
-			w = std::max(w, r.x + r.w);
-			h = std::max(h, r.y + r.h);
+			w = eastl::max(w, r.x + r.w);
+			h = eastl::max(h, r.y + r.h);
 		}
 	};
 
-	struct rect_xywh {
+	struct rect_xywh
+	{
 		int x;
 		int	y;
 		int w;
@@ -46,12 +49,14 @@ namespace rectpack2D {
 		int	area() const { return w * h; }
 		int perimeter() const { return 2 * w + 2 * h; }
 
-		auto get_wh() const {
+		auto get_wh() const
+		{
 			return rect_wh(w, h);
 		}
 	};
 
-	struct rect_xywhf {
+	struct rect_xywhf
+	{
 		int x;
 		int y;
 		int w;
@@ -65,7 +70,8 @@ namespace rectpack2D {
 		int	area() const { return w * h; }
 		int perimeter() const { return 2 * w + 2 * h; }
 
-		auto get_wh() const {
+		auto get_wh() const
+		{
 			return rect_wh(w, h);
 		}
 	};

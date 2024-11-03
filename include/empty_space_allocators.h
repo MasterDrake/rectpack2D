@@ -1,13 +1,13 @@
 #pragma once
-#include <array>
-#include <vector>
-#include <type_traits>
+#include <EASTL/array.h>
+#include <EASTL/vector.h>
+#include <EASTL/type_traits.h>
 
 #include "rect_structs.h"
 
 namespace rectpack2D {
 	class default_empty_spaces {
-		std::vector<space_rect> empty_spaces;
+		eastl::vector<space_rect> empty_spaces;
 
 	public:
 		void remove(const int i) {
@@ -36,7 +36,7 @@ namespace rectpack2D {
 	template <int MAX_SPACES>
 	class static_empty_spaces {
 		int count_spaces = 0;
-		std::array<space_rect, MAX_SPACES> empty_spaces;
+		eastl::array<space_rect, MAX_SPACES> empty_spaces;
 
 	public:
 		void remove(const int i) {
@@ -54,7 +54,7 @@ namespace rectpack2D {
 
 			return false;
 		}
-		
+
 		auto get_count() const {
 			return count_spaces;
 		}

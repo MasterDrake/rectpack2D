@@ -1,25 +1,30 @@
 #pragma once
-#include <variant>
+#include <EASTL/variant.h>
 #include <cassert>
 #include "rect_structs.h"
 
-namespace rectpack2D {
-	enum class callback_result {
+namespace rectpack2D
+{
+	enum class callback_result
+	{
 		ABORT_PACKING,
 		CONTINUE_PACKING
 	};
 
 	template <class T>
-	auto& dereference(T& r) {
+	auto& dereference(T& r)
+	{
 		/* 
 			This will allow us to pass orderings that consist of pointers,
 			as well as ones that are just plain objects in a vector.
 	   */	   
 
-		if constexpr(std::is_pointer_v<T>) {
+		if constexpr(eastl::is_pointer_v<T>)
+		{
 			return *r;
 		}
-		else {
+		else
+		{
 			return r;
 		}
 	};
@@ -38,14 +43,15 @@ namespace rectpack2D {
 		In this case, we return the viable bin (rect_wh).
 	*/
 
-	enum class bin_dimension {
+	enum class bin_dimension
+	{
 		BOTH,
 		WIDTH,
 		HEIGHT
 	};
 
 	template <class empty_spaces_type, class O>
-	std::variant<total_area_type, rect_wh> best_packing_for_ordering_impl(
+	eastl::variant<total_area_type, rect_wh> best_packing_for_ordering_impl(
 		empty_spaces_type& root,
 		O ordering,
 		const rect_wh starting_bin,
@@ -80,7 +86,7 @@ namespace rectpack2D {
 			starting_step = candidate_bin.h / 2;
 		}
 
-		for (int step = starting_step; ; step = std::max(1, step / 2)) {
+		for (int step = starting_step; ; step = eastl::max(1, step / 2)) {
 			//std::cout << "candidate: " << candidate_bin.w << "x" << candidate_bin.h << std::endl;
 
 			root.reset(candidate_bin);
@@ -102,7 +108,8 @@ namespace rectpack2D {
 				return true;
 			}();
 
-			if (all_inserted) {
+			if (all_inserted)
+			{
 				/* Attempt was successful. Try with a smaller bin. */
 
 				if (step <= discard_step) {
@@ -129,7 +136,8 @@ namespace rectpack2D {
 
 				root.reset(candidate_bin);
 			}
-			else {
+			else
+			{
 				/* Attempt ended with failure. Try with a bigger bin. */
 
 				if (tried_dimension == bin_dimension::BOTH) {
@@ -159,19 +167,17 @@ namespace rectpack2D {
 	}
 
 	template <class empty_spaces_type, class O>
-	std::variant<total_area_type, rect_wh> best_packing_for_ordering(
+	eastl::variant<total_area_type, rect_wh> best_packing_for_ordering(
 		empty_spaces_type& root,
 		O&& ordering,
 		const rect_wh starting_bin,
 		const int discard_step
 	) {
-		const auto try_pack = [&](
-			const bin_dimension tried_dimension, 
-			const rect_wh starting_bin
-		) {
+		const auto try_pack = [&](const bin_dimension tried_dimension, const rect_wh starting_bin)
+		{
 			return best_packing_for_ordering_impl(
 				root,
-				std::forward<O>(ordering),
+				eastl::forward<O>(ordering),
 				starting_bin,
 				discard_step,
 				tried_dimension
@@ -180,16 +186,19 @@ namespace rectpack2D {
 
 		const auto best_result = try_pack(bin_dimension::BOTH, starting_bin);
 
-		if (const auto failed = std::get_if<total_area_type>(&best_result)) {
+		if (const auto failed = eastl::get_if<total_area_type>(&best_result))
+		{
 			return *failed;
 		}
 
-		auto best_bin = std::get<rect_wh>(best_result);
+		auto best_bin = eastl::get<rect_wh>(best_result);
 
-		auto trial = [&](const bin_dimension tried_dimension) {
+		auto trial = [&](const bin_dimension tried_dimension)
+		{
 			const auto trial = try_pack(tried_dimension, best_bin);
 
-			if (const auto better = std::get_if<rect_wh>(&trial)) {
+			if (const auto better = eastl::get_if<rect_wh>(&trial))
+			{
 				best_bin = *better;
 			}
 		};
@@ -213,7 +222,8 @@ namespace rectpack2D {
 		class F,
 		class I
 	>
-	rect_wh find_best_packing_impl(F for_each_order, const I input) {
+	rect_wh find_best_packing_impl(F for_each_order, const I input)
+	{
 		const auto max_bin = rect_wh(input.max_bin_side, input.max_bin_side);
 
 		OrderType* best_order = nullptr;
@@ -229,7 +239,8 @@ namespace rectpack2D {
 		thread_local empty_spaces_type root = rect_wh();
 		root.flipping_mode = input.flipping_mode;
 
-		for_each_order ([&](OrderType& current_order) {
+		for_each_order ([&](OrderType& current_order)
+		{
 			const auto packing = best_packing_for_ordering(
 				root,
 				current_order,
@@ -237,44 +248,52 @@ namespace rectpack2D {
 				input.discard_step
 			);
 
-			if (const auto total_inserted = std::get_if<total_area_type>(&packing)) {
+			if (const auto total_inserted = eastl::get_if<total_area_type>(&packing))
+			{
 				/*
 					Track which function inserts the most area in total,
 					just in case that all orders will fail to fit into the largest allowed bin.
 				*/
 				if (best_order == nullptr) {
 					if (*total_inserted > best_total_inserted) {
-						best_order = std::addressof(current_order);
+						best_order = eastl::addressof(current_order);
 						best_total_inserted = *total_inserted;
 					}
 				}
 			}
-			else if (const auto result_bin = std::get_if<rect_wh>(&packing)) {
+			else if (const auto result_bin = eastl::get_if<rect_wh>(&packing))
+			{
 				/* Save the function if it performed the best. */
-				if (result_bin->area() <= best_bin.area()) {
-					best_order = std::addressof(current_order);
+				if (result_bin->area() <= best_bin.area())
+				{
+					best_order = eastl::addressof(current_order);
 					best_bin = *result_bin;
 				}
 			}
 		});
 
 		{
-			assert(best_order != nullptr);
+			assert(best_order);
 			
 			root.reset(best_bin);
 
-			for (auto& rr : *best_order) {
+			for (auto& rr : *best_order)
+			{
 				auto& rect = dereference(rr);
 
-				if (const auto ret = root.insert(rect.get_wh())) {
+				if (const auto ret = root.insert(rect.get_wh()))
+				{
 					rect = *ret;
 
-					if (callback_result::ABORT_PACKING == input.handle_successful_insertion(rect)) {
+					if (callback_result::ABORT_PACKING == input.handle_successful_insertion(rect))
+					{
 						break;
 					}
 				}
-				else {
-					if (callback_result::ABORT_PACKING == input.handle_unsuccessful_insertion(rect)) {
+				else
+				{
+					if (callback_result::ABORT_PACKING == input.handle_unsuccessful_insertion(rect))
+					{
 						break;
 					}
 				}
