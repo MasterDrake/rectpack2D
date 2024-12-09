@@ -29,7 +29,7 @@ install(DIRECTORY include/ DESTINATION include)
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/rectpack2DConfigVersion.cmake
         COMPATIBILITY SameMajorVersion)
-install(TARGETS rectpack2D EASTL
+install(TARGETS rectpack2D
         EXPORT rectpack2DTargets
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(EXPORT rectpack2DTargets
