@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.22 VERSION 1.0)
+cmake_minimum_required(VERSION 3.22)
 
-project(rectpack2D)
+project(rectpack2D VERSION 1.0.0)
 
 add_library(rectpack2D)
 
