@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.22 VERSION 1.0)
 
 project(rectpack2D)
 
-add_library(rectpack2D INTERFACE)
+add_library(rectpack2D)
 
-target_include_directories(rectpack2D INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(rectpack2D PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(EASTL CONFIG REQUIRED)
 target_link_libraries(rectpack2D PUBLIC EASTL)
