@@ -4,7 +4,7 @@ project(rectpack2D VERSION 1.0.0)
 
 add_library(rectpack2D)
 
-target_include_directories(rectpack2D PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#target_include_directories(rectpack2D PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(EASTL CONFIG REQUIRED)
 target_link_libraries(rectpack2D PUBLIC EASTL)
