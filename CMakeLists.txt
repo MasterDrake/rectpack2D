@@ -7,7 +7,7 @@ add_library(rectpack2D INTERFACE)
 target_include_directories(rectpack2D INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 find_package(EASTL CONFIG REQUIRED)
-target_link_libraries(rectpack2D PRIVATE EASTL)
+target_link_libraries(rectpack2D PUBLIC EASTL)
 
 target_compile_options(rectpack2D PRIVATE
   -Wall
